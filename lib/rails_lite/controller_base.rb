@@ -1,3 +1,4 @@
+require 'active_support/core_ext'
 require 'erb'
 require_relative 'params'
 require_relative 'session'
@@ -31,6 +32,11 @@ class ControllerBase
   end
 
   def render(template_name)
+    controller_name = self.class.to_s.underscore
+    file_location = "views/#{controller_name}/#{template_name}.html.erb"
+    template_file = File.read(file_location)
+    erb_file = ERB.new(template_file).result(binding)
+    render_content(erb_file, "text/html")
   end
 
   def invoke_action(name)

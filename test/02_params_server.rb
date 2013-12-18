@@ -32,6 +32,7 @@ end
 server.mount_proc '/' do |req, res|
   case req.path
   when '/'
+    puts "THIS IS THE REQ BODY #{req.body}"
     contr = ExampleController.new(req, res).create
   when '/new'
     contr = ExampleController.new(req, res).new

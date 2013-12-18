@@ -6,6 +6,7 @@ require_relative 'session'
 class ControllerBase
   attr_reader :params
 
+  #when is route_params passed in?
   def initialize(req, res, *route_params)
     @req = req
     @res = res

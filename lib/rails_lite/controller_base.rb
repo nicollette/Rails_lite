@@ -9,10 +9,11 @@ class ControllerBase
   def initialize(req, res, *route_params)
     @req = req
     @res = res
-    @params = route_params
+    @params = Params.new(@req, route_params)
   end
 
   def session
+    @session ||= Session.new(@req)
   end
 
   def already_rendered?
@@ -23,12 +24,14 @@ class ControllerBase
     @res.status = 302
     @res.header["location"] = url
     @already_built_response = true
+    session.store_session(@res)
   end
 
   def render_content(content, type)
     @res.content_type = type
     @res.body = content
     @already_built_response = true
+    session.store_session(@res)
   end
 
   def render(template_name)

@@ -19,7 +19,9 @@ class ExampleController < ControllerBase
     page = <<-END
 <form action="/" method="post">
   <input type="text" name="cat[name]">
-  <input type="text" name="cat[owner]">
+  <input type="text" name="cat[owner][address]">
+  <input type="text" name="cat[owner][city]">
+  <input type="text" name="cat[owner][state]">
 
   <input type="submit">
 </form>

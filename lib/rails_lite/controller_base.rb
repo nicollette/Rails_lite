@@ -6,8 +6,7 @@ require_relative 'session'
 class ControllerBase
   attr_reader :params
 
-  #when is route_params passed in?
-  def initialize(req, res, *route_params)
+  def initialize(req, res, route_params)
     @req = req
     @res = res
     @params = Params.new(@req, route_params)
@@ -44,5 +43,7 @@ class ControllerBase
   end
 
   def invoke_action(name)
+    self.send(name)
+    render(name) unless already_rendered?
   end
 end

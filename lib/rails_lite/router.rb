@@ -9,12 +9,24 @@ class Route
   end
 
   def matches?(req)
-    #need more stuff?
-    
-    http_method == req.request_method.downcase.to_sym
+    (@http_method == req.request_method.downcase.to_sym) && 
+      (@pattern.match(req.path))
   end
 
   def run(req, res)
+    route_params = {}
+    
+    match_data = @pattern.match(req.path)
+    matched_names = match_data.names # => ["id"]
+    matched_captures = match_data.captures # => ["1"]
+    
+    matched_names.each do |name|
+      matched_captures.each do |capture|
+        route_params[name.to_sym] = capture
+      end
+    end
+    
+    @controller_class.new(req, res, route_params).invoke_action(@action_name)
   end
 end
 
@@ -28,15 +40,12 @@ class Router
   def add_route(route)
     @routes << route
   end
-  # def add_route(pattern, method, controller_class, action_name)
-  #   @routes << Route.new(pattern, method, controller_class, action_name)
-  # end
 
   def draw(&proc)
+    self.instance_eval(&proc) 
   end
 
   [:get, :post, :put, :delete].each do |http_method|
-    # add these helpers in a loop here
     define_method(http_method) do |pattern, controller_class, action_name|
       route = Route.new(pattern, http_method, controller_class, action_name)
       add_route(route)
@@ -44,8 +53,14 @@ class Router
   end
 
   def match(req)
+    @routes.select { |route| route.matches?(req) }.first
   end
 
   def run(req, res)
+    if match(req).nil?
+      res.status = 404
+    else
+      match(req).run(req, res)
+    end
   end
 end
